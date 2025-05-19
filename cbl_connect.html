@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBL Connect - Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        .sidebar-icon {
+            font-size: 1.5rem; /* 24px */
+        }
+        .active-nav {
+            background-color: #1e40af; /* Darker blue for active nav item */
+            color: white;
+        }
+        .active-nav span, .active-nav ion-icon {
+            color: white !important;
+        }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Basic progress bar styling */
+        .progress-bar-bg {
+            background-color: #e5e7eb; /* gray-200 */
+            border-radius: 0.375rem; /* rounded-md */
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background-color: #3b82f6; /* blue-500 */
+            height: 100%;
+            text-align: center;
+            color: white;
+            font-size: 0.75rem; /* text-xs */
+            line-height: 1rem; /* leading-4 */
+            border-radius: 0.375rem; /* rounded-md */
+            transition: width 0.5s ease-in-out;
+        }
+        /* Card hover effect */
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-400 to-blue-600 p-4">
+        <div class="bg-white p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">CBL Connect</h1>
+                <p class="text-gray-600 mt-2">Welcome Back!</p>
+            </div>
+            <form id="login-form">
+                <div class="mb-6">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="username" value="manager" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" placeholder="e.g., manager">
+                </div>
+                <div class="mb-8">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="password" value="password123" class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition duration-150 ease-in-out transform hover:scale-105">
+                    Login
+                </button>
+                <p id="login-error" class="text-red-500 text-sm mt-4 text-center"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden min-h-screen bg-gray-100">
+        <div class="flex h-screen">
+            <aside class="w-20 md:w-64 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col transition-all duration-300 ease-in-out">
+                <div class="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-blue-800">
+                    <ion-icon name="leaf-outline" class="text-3xl text-green-300"></ion-icon>
+                    <span class="ml-3 text-xl font-bold hidden md:inline">CBL Connect</span>
+                </div>
+                <nav class="flex-grow mt-6 space-y-2 px-2 md:px-4">
+                    <a href="#" data-view="dashboard" class="nav-link flex items-center py-3 px-3 rounded-lg hover:bg-blue-700 transition-colors duration-150 active-nav">
+                        <ion-icon name="grid-outline" class="sidebar-icon text-blue-300"></ion-icon>
+                        <span class="ml-4 text-sm font-medium hidden md:inline">Dashboard</span>
+                    </a>
+                    <a href="#" data-view="supply-chain" class="nav-link flex items-center py-3 px-3 rounded-lg hover:bg-blue-700 transition-colors duration-150">
+                        <ion-icon name="git-network-outline" class="sidebar-icon text-blue-300"></ion-icon>
+                        <span class="ml-4 text-sm font-medium hidden md:inline">Supply Chain</span>
+                    </a>
+                    <a href="#" data-view="export-sales" class="nav-link flex items-center py-3 px-3 rounded-lg hover:bg-blue-700 transition-colors duration-150">
+                        <ion-icon name="trending-up-outline" class="sidebar-icon text-blue-300"></ion-icon>
+                        <span class="ml-4 text-sm font-medium hidden md:inline">Export Sales</span>
+                    </a>
+                    <a href="#" data-view="farmer-engagement" class="nav-link flex items-center py-3 px-3 rounded-lg hover:bg-blue-700 transition-colors duration-150">
+                        <ion-icon name="people-outline" class="sidebar-icon text-blue-300"></ion-icon>
+                        <span class="ml-4 text-sm font-medium hidden md:inline">Farmer Engagement</span>
+                    </a>
+                </nav>
+                <div class="p-4 border-t border-blue-800">
+                     <a href="#" id="logout-button" class="flex items-center py-3 px-3 rounded-lg hover:bg-red-600 transition-colors duration-150">
+                        <ion-icon name="log-out-outline" class="sidebar-icon text-red-300"></ion-icon>
+                        <span class="ml-4 text-sm font-medium hidden md:inline">Logout</span>
+                    </a>
+                </div>
+            </aside>
+
+            <main class="flex-1 flex flex-col overflow-hidden">
+                <header class="h-20 bg-white shadow-md flex items-center justify-between px-6">
+                    <h2 id="view-title" class="text-2xl font-semibold text-gray-800">Dashboard</h2>
+                    <div class="flex items-center">
+                        <span class="text-gray-600 mr-3 hidden sm:inline">Welcome, Manager!</span>
+                        <ion-icon name="person-circle-outline" class="text-3xl text-blue-600"></ion-icon>
+                    </div>
+                </header>
+                <div id="content-area" class="flex-1 p-6 overflow-y-auto bg-gray-50">
+                    </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Mock Data
+        const mockData = {
+            overview: {
+                nutsPurchased: 43500000,
+                nutsBudgeted: 61000000,
+                exportRevenue: 29300000, // USD
+                exportBudgeted: 39000000, // USD
+                activeFarmers: 555,
+                organicAcreage: 6720,
+                directFarmerPaymentsActual: 4800000000, // Rs
+                directFarmerPaymentsBudgeted: 6900000000, // Rs
+            },
+            supplyChain: {
+                procurementByCompany: [
+                    { company: "CBL Natural Foods (Pvt) Ltd", nuts: 18500000, type: "Tropical Fruits & Coconut Beverages" },
+                    { company: "CBL Global Foods Ltd", nuts: 15000000, type: "Coconut Milk & Water (Tetra/UHT)" },
+                    { company: "CBL Cocos (Pvt) Ltd", nuts: 10000000, type: "Desiccated Coconut" },
+                ],
+                recentCollections: [
+                    { farmerId: "FARM001", name: "A. Perera", nuts: 5200, date: "2025-05-18", location: "Kurunegala" },
+                    { farmerId: "FARM002", name: "B. Silva", nuts: 3800, date: "2025-05-18", location: "Puttalam" },
+                    { farmerId: "FARM003", name: "C. Fernando", nuts: 6100, date: "2025-05-17", location: "Gampaha" },
+                    { farmerId: "FARM004", name: "D. Kumari", nuts: 4500, date: "2025-05-17", location: "Kegalle" },
+                ]
+            },
+            exportSales: {
+                revenueByRegion: [
+                    { region: "Europe", revenue: 12000000, target: 15000000, growth: 20 }, // Growth in %
+                    { region: "USA", revenue: 8000000, target: 10000000, growth: 15 },
+                    { region: "Oceania", revenue: 5000000, target: 7000000, growth: 10 },
+                    { region: "Far East", revenue: 4300000, target: 7000000, growth: 5 },
+                ],
+                topProducts: [
+                    { name: "Coconut Milk (Tetra)", revenue: 10000000, unitsSold: 500000 },
+                    { name: "Coconut Water (UHT)", revenue: 8500000, unitsSold: 700000 },
+                    { name: "Desiccated Coconut (Fine)", revenue: 6000000, unitsSold: 1200000 }, // in kg
+                    { name: "Organic Virgin Coconut Oil", revenue: 4800000, unitsSold: 200000 },
+                ]
+            },
+            farmers: [
+                { id: "FARM001", name: "A. Perera", region: "Kurunegala", organic: true, acreage: 15, lastPayment: "Rs. 520,000", status: "Active", joinDate: "2018-03-10" },
+                { id: "FARM002", name: "B. Silva", region: "Puttalam", organic: true, acreage: 12, lastPayment: "Rs. 380,000", status: "Active", joinDate: "2019-07-22" },
+                { id: "FARM003", name: "C. Fernando", region: "Gampaha", organic: false, acreage: 20, lastPayment: "Rs. 610,000", status: "Active", joinDate: "2017-01-15" },
+                { id: "FARM004", name: "D. Kumari", region: "Kegalle", organic: true, acreage: 8, lastPayment: "Rs. 450,000", status: "Active", joinDate: "2020-11-05" },
+                { id: "FARM005", name: "E. Rajapaksa", region: "Chilaw", organic: true, acreage: 25, lastPayment: "Rs. 750,000", status: "Pending Renewal", joinDate: "2016-05-01" },
+            ],
+            keyInsights: [
+                { title: "Organic Farmer Growth", text: "Active organic farmer base increased by 12% in the last year.", icon: "trending-up-outline", color: "green" },
+                { title: "Export Target Europe", text: "Europe region is currently at 80% of its annual export revenue target.", icon: "flag-outline", color: "blue" },
+                { title: "Nut Procurement", text: "Nut procurement is on track, currently at 71% of the annual budget.", icon: "leaf-outline", color: "green" },
+                { title: "High Demand Product", text: "Coconut water (UHT) showing highest demand increase in Far East market.", icon: "water-outline", color: "teal" }
+            ]
+        };
+
+        // DOM Elements
+        const loginScreen = document.getElementById('login-screen');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const contentArea = document.getElementById('content-area');
+        const viewTitle = document.getElementById('view-title');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const logoutButton = document.getElementById('logout-button');
+
+        // Helper function to format numbers
+        function formatNumber(num) {
+            return num.toLocaleString('en-US');
+        }
+        function formatCurrency(num, currency = 'USD') {
+            return num.toLocaleString('en-US', { style: 'currency', currency: currency, minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+         function formatRupees(num) {
+            return 'Rs. ' + num.toLocaleString('en-LK', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+
+        // Render Functions
+        function renderDashboard() {
+            viewTitle.textContent = 'Dashboard';
+            const data = mockData.overview;
+            const insights = mockData.keyInsights;
+
+            const nutsPurchasedPercent = (data.nutsPurchased / data.nutsBudgeted) * 100;
+            const exportRevenuePercent = (data.exportRevenue / data.exportBudgeted) * 100;
+            const farmerPaymentsPercent = (data.directFarmerPaymentsActual / data.directFarmerPaymentsBudgeted) * 100;
+
+            contentArea.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 metric-card transition-all duration-300">
+                        <div class="p-3 bg-blue-100 rounded-full"><ion-icon name="leaf-outline" class="text-2xl text-blue-600"></ion-icon></div>
+                        <div>
+                            <p class="text-sm text-gray-500">Nuts Purchased</p>
+                            <p class="text-2xl font-semibold text-gray-800">${formatNumber(data.nutsPurchased)}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 metric-card transition-all duration-300">
+                        <div class="p-3 bg-green-100 rounded-full"><ion-icon name="cash-outline" class="text-2xl text-green-600"></ion-icon></div>
+                        <div>
+                            <p class="text-sm text-gray-500">Export Revenue (USD)</p>
+                            <p class="text-2xl font-semibold text-gray-800">${formatCurrency(data.exportRevenue)}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 metric-card transition-all duration-300">
+                        <div class="p-3 bg-yellow-100 rounded-full"><ion-icon name="people-circle-outline" class="text-2xl text-yellow-600"></ion-icon></div>
+                        <div>
+                            <p class="text-sm text-gray-500">Active Farmers</p>
+                            <p class="text-2xl font-semibold text-gray-800">${formatNumber(data.activeFarmers)}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 metric-card transition-all duration-300">
+                        <div class="p-3 bg-purple-100 rounded-full"><ion-icon name="map-outline" class="text-2xl text-purple-600"></ion-icon></div>
+                        <div>
+                            <p class="text-sm text-gray-500">Organic Acreage</p>
+                            <p class="text-2xl font-semibold text-gray-800">${formatNumber(data.organicAcreage)} acres</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Nut Procurement Progress</h3>
+                        <p class="text-sm text-gray-500 mb-1">${formatNumber(data.nutsPurchased)} / ${formatNumber(data.nutsBudgeted)} nuts</p>
+                        <div class="progress-bar-bg h-4 w-full">
+                            <div class="progress-bar-fill" style="width: ${nutsPurchasedPercent.toFixed(1)}%;">${nutsPurchasedPercent.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Export Revenue Progress (USD)</h3>
+                        <p class="text-sm text-gray-500 mb-1">${formatCurrency(data.exportRevenue)} / ${formatCurrency(data.exportBudgeted)}</p>
+                        <div class="progress-bar-bg h-4 w-full">
+                            <div class="progress-bar-fill bg-green-500" style="width: ${exportRevenuePercent.toFixed(1)}%;">${exportRevenuePercent.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Farmer Payments Progress (Rs)</h3>
+                        <p class="text-sm text-gray-500 mb-1">${formatRupees(data.directFarmerPaymentsActual)} / ${formatRupees(data.directFarmerPaymentsBudgeted)}</p>
+                        <div class="progress-bar-bg h-4 w-full">
+                            <div class="progress-bar-fill bg-yellow-500" style="width: ${farmerPaymentsPercent.toFixed(1)}%;">${farmerPaymentsPercent.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Key Insights & Alerts</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${insights.map(insight => `
+                            <div class="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <ion-icon name="${insight.icon}" class="text-2xl mr-3 text-${insight.color}-500"></ion-icon>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">${insight.title}</h4>
+                                    <p class="text-sm text-gray-600">${insight.text}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSupplyChain() {
+            viewTitle.textContent = 'Supply Chain Overview';
+            const data = mockData.supplyChain;
+            const totalNuts = data.procurementByCompany.reduce((sum, item) => sum + item.nuts, 0);
+
+            contentArea.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Nut Procurement by Company Unit</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company / Unit</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Primary Focus</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nuts Processed</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">% of Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${data.procurementByCompany.map(item => `
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.company}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.type}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${formatNumber(item.nuts)}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${((item.nuts / totalNuts) * 100).toFixed(1)}%</td>
+                                    </tr>
+                                `).join('')}
+                                <tr class="bg-gray-50 font-semibold">
+                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" colspan="2">Total Nuts Processed</td>
+                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">${formatNumber(totalNuts)}</td>
+                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">100%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Recent Farmer Collections</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Farmer ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Farmer Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Nuts Collected</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Collection Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${data.recentCollections.map(item => `
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.farmerId}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.location}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${formatNumber(item.nuts)}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.date}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderExportSales() {
+            viewTitle.textContent = 'Export Sales Performance';
+            const data = mockData.exportSales;
+            const totalRevenue = data.revenueByRegion.reduce((sum, item) => sum + item.revenue, 0);
+            const totalTarget = data.revenueByRegion.reduce((sum, item) => sum + item.target, 0);
+
+            contentArea.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-1">Revenue by Export Region (USD)</h3>
+                    <p class="text-sm text-gray-500 mb-4">Total Revenue: ${formatCurrency(totalRevenue)} / ${formatCurrency(totalTarget)} Target</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${data.revenueByRegion.map(item => `
+                            <div class="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                <h4 class="font-semibold text-blue-600">${item.region}</h4>
+                                <p class="text-lg font-bold text-gray-800">${formatCurrency(item.revenue)}</p>
+                                <p class="text-xs text-gray-500">Target: ${formatCurrency(item.target)}</p>
+                                <div class="mt-2 progress-bar-bg h-3 w-full">
+                                    <div class="progress-bar-fill bg-green-500" style="width: ${((item.revenue / item.target) * 100).toFixed(1)}%;"></div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">${((item.revenue / item.target) * 100).toFixed(1)}% of target</p>
+                                <p class="text-xs ${item.growth >= 0 ? 'text-green-600' : 'text-red-600'}">Growth: ${item.growth}% YoY</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Top Performing Products (by Revenue)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue (USD)</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Units Sold / Volume</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${data.topProducts.map(item => `
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.name}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${formatCurrency(item.revenue)}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${formatNumber(item.unitsSold)} ${item.name.includes("Desiccated Coconut") ? 'kg' : 'units'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFarmerEngagement() {
+            viewTitle.textContent = 'Farmer Engagement';
+            const farmers = mockData.farmers;
+            contentArea.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-gray-700">Farmer Directory (${farmers.length} Active/Monitored)</h3>
+                        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center">
+                            <ion-icon name="add-circle-outline" class="mr-2"></ion-icon> Add New Farmer
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Region</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organic</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acreage</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Payment</th>
+                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${farmers.map(farmer => `
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${farmer.id}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${farmer.name}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${farmer.region}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${farmer.organic ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                                ${farmer.organic ? 'Yes' : 'No'}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${farmer.acreage}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${farmer.lastPayment}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${farmer.status === 'Active' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">
+                                                ${farmer.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Announcements & Resources</h3>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <h4 class="font-semibold text-blue-700">New Organic Farming Workshop - June 15th</h4>
+                            <p class="text-sm text-gray-600">Register by June 10th to learn about advanced organic pest control techniques.</p>
+                        </div>
+                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <h4 class="font-semibold text-green-700">Updated Fair Trade Pricing Policy</h4>
+                            <p class="text-sm text-gray-600">The new pricing policy for certified organic coconuts is now in effect. Details available on the farmer portal.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Navigation Handler
+        function navigateTo(view) {
+            // Remove active class from all nav links
+            navLinks.forEach(link => link.classList.remove('active-nav'));
+            // Add active class to the clicked link
+            document.querySelector(`.nav-link[data-view="${view}"]`).classList.add('active-nav');
+            
+            // Update content based on view
+            if (view === 'dashboard') renderDashboard();
+            else if (view === 'supply-chain') renderSupplyChain();
+            else if (view === 'export-sales') renderExportSales();
+            else if (view === 'farmer-engagement') renderFarmerEngagement();
+            
+            localStorage.setItem('currentView', view); // Save current view
+        }
+
+        // Event Listeners
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            // Simple validation (replace with actual auth in a real app)
+            if (username === 'manager' && password === 'password123') {
+                loginScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                localStorage.setItem('isLoggedIn', 'true');
+                navigateTo(localStorage.getItem('currentView') || 'dashboard'); // Load last view or dashboard
+            } else {
+                loginError.textContent = 'Invalid username or password.';
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const view = link.getAttribute('data-view');
+                navigateTo(view);
+            });
+        });
+
+        logoutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentView');
+            appContainer.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+            loginError.textContent = ''; // Clear any previous login errors
+            document.getElementById('username').value = 'manager'; // Reset username for convenience
+            document.getElementById('password').value = 'password123'; // Reset password
+        });
+
+        // Check login status on page load
+        document.addEventListener('DOMContentLoaded', () => {
+                loginScreen.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                navigateTo(localStorage.getItem('currentView') || 'dashboard');
+            } else {
+                appContainer.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
+            }
+        });
+
+    </script>
+</body>
+</html>
